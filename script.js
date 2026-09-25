@@ -1,117 +1,116 @@
 /* =========================================================
    Crypto Volatility Scanner ⚡ — script.js
-   Volatilità = deviazione standard dei rendimenti giornalieri
+   Volatility = standard deviation of daily returns
+   Features: sparklines, CSV export, light/dark toggle
    ========================================================= */
 
 (function () {
   "use strict";
 
   /* =======================================================
-     1) UNIVERSO ASSET (seed deterministico)
+     1) ASSET UNIVERSE (deterministic seed)
      ======================================================= */
   const COINS = [
-    { sym: "BTC", name: "Bitcoin",    color: "#f7931a" },
-    { sym: "ETH", name: "Ethereum",   color: "#627eea" },
-    { sym: "SOL", name: "Solana",     color: "#14f195" },
-    { sym: "BNB", name: "BNB",        color: "#f3ba2f" },
-    { sym: "XRP", name: "XRP",        color: "#23a3dc" },
-    { sym: "ADA", name: "Cardano",    color: "#0033ad" },
-    { sym: "AVAX",name: "Avalanche",  color: "#e84142" },
-    { sym: "DOGE",name: "Dogecoin",   color: "#c2a633" },
-    { sym: "DOT", name: "Polkadot",   color: "#e6007a" },
-    { sym: "MATIC",name:"Polygon",    color: "#8247e5" },
-    { sym: "LINK",name: "Chainlink",  color: "#2a5ada" },
-    { sym: "TON", name: "Toncoin",    color: "#0098ea" },
-    { sym: "TRX", name: "TRON",       color: "#eb0029" },
-    { sym: "SHIB",name: "Shiba Inu",  color: "#f00500" },
-    { sym: "LTC", name: "Litecoin",   color: "#a6a9aa" },
-    { sym: "BCH", name: "Bitcoin Cash",color: "#8dc351" },
-    { sym: "NEAR",name: "NEAR",       color: "#00c08b" },
-    { sym: "UNI", name: "Uniswap",    color: "#ff007a" },
-    { sym: "APT", name: "Aptos",      color: "#00b4d8" },
-    { sym: "ATOM",name: "Cosmos",     color: "#6f7390" },
-    { sym: "FIL", name: "Filecoin",   color: "#0090ff" },
-    { sym: "ICP", name: "Internet Computer", color: "#29abe2" },
-    { sym: "ETC", name: "Ethereum Classic", color: "#328332" },
-    { sym: "XLM", name: "Stellar",    color: "#7d00ff" },
-    { sym: "HBAR",name: "Hedera",     color: "#222222" },
-    { sym: "INJ", name: "Injective",  color: "#00d2ff" },
-    { sym: "OP",  name: "Optimism",   color: "#ff0420" },
-    { sym: "ARB", name: "Arbitrum",   color: "#12aaff" },
-    { sym: "SUI", name: "Sui",        color: "#4da2ff" },
-    { sym: "TIA", name: "Celestia",   color: "#7b2bf9" },
-    { sym: "SEI", name: "Sei",        color: "#9e1f19" },
-    { sym: "AAVE",name: "Aave",       color: "#b6509e" },
-    { sym: "MKR", name: "Maker",      color: "#1aab9b" },
-    { sym: "RNDR",name: "Render",     color: "#ff3a00" },
-    { sym: "IMX", name: "Immutable",  color: "#0ed0d0" },
-    { sym: "GRT", name: "The Graph",  color: "#6747ed" },
-    { sym: "ALGO",name: "Algorand",   color: "#000000" },
-    { sym: "FTM", name: "Fantom",     color: "#1969ff" },
-    { sym: "SAND",name: "The Sandbox",color: "#00adef" },
-    { sym: "MANA",name: "Decentraland",color:"#ff2d55" },
-    { sym: "AXS", name: "Axie Infinity",color:"#0055d5" },
-    { sym: "EOS", name: "EOS",        color: "#443f54" },
-    { sym: "XTZ", name: "Tezos",      color: "#2c7df7" },
-    { sym: "EGLD",name: "MultiversX", color: "#1b46c2" },
-    { sym: "FLOW",name: "Flow",       color: "#00ef8b" },
-    { sym: "CHZ", name: "Chiliz",     color: "#cd0124" },
-    { sym: "CRV", name: "Curve",      color: "#40649f" },
-    { sym: "SNX", name: "Synthetix",  color: "#00d1ff" },
-    { sym: "COMP",name: "Compound",   color: "#00d395" },
-    { sym: "ZEC", name: "Zcash",      color: "#f4b728" },
-    { sym: "DASH",name: "Dash",       color: "#008ce7" },
-    { sym: "NEO", name: "Neo",        color: "#58bf00" },
-    { sym: "IOTA",name: "IOTA",       color: "#131f37" },
-    { sym: "QTUM",name: "Qtum",       color: "#2e9ad0" },
-    { sym: "WAVES",name:"Waves",      color: "#0155ff" },
-    { sym: "KSM", name: "Kusama",     color: "#000000" },
-    { sym: "ZIL", name: "Zilliqa",    color: "#49c1e0" },
-    { sym: "ONE", name: "Harmony",    color: "#00ade8" },
-    { sym: "ENJ", name: "Enjin",      color: "#7866d5" },
-    { sym: "BAT", name: "Basic Attention", color: "#ff5000" },
-    { sym: "ANKR",name: "Ankr",       color: "#356dff" },
-    { sym: "STORJ",name:"Storj",      color: "#268ff7" },
-    { sym: "KAVA",name: "Kava",       color: "#ff564f" },
-    { sym: "ROSE",name: "Oasis",      color: "#0092f6" },
-    { sym: "CELO",name: "Celo",       color: "#35d07f" },
-    { sym: "BAND",name: "Band Protocol", color:"#516aff" },
-    { sym: "OCEAN",name:"Ocean",      color: "#141414" },
-    { sym: "RSR", name: "Reserve Rights", color:"#000000" },
-    { sym: "LRC", name: "Loopring",   color: "#1c42ff" },
-    { sym: "SUSHI",name:"SushiSwap",  color: "#0e0f23" },
-    { sym: "YFI", name: "yearn.finance", color:"#006ae3" },
-    { sym: "UMA", name: "UMA",        color: "#ff4a4a" },
-    { sym: "REN", name: "Ren",        color: "#001b3a" },
-    { sym: "KNC", name: "Kyber",      color: "#31cb9e" },
-    { sym: "BAL", name: "Balancer",   color: "#1e1e1e" },
-    { sym: "CVC", name: "Civic",      color: "#3ab03e" },
-    { sym: "GNO", name: "Gnosis",     color: "#04795b" },
-    { sym: "NMR", name: "Numeraire",  color: "#0d1b2a" },
-    { sym: "MLN", name: "Enzyme",     color: "#1e1e1e" },
-    { sym: "REP", name: "Augur",      color: "#602a52" },
-    { sym: "ANT", name: "Aragon",     color: "#24d3ee" },
-    { sym: "MANA2",name:"Mana",       color: "#ff2d55" },
-    { sym: "HNT", name: "Helium",     color: "#474dff" },
-    { sym: "AKT", name: "Akash",      color: "#ff4141" },
-    { sym: "AR",  name: "Arweave",    color: "#222222" },
-    { sym: "THETA",name:"Theta",      color: "#2ab8e6" },
-    { sym: "TFUEL",name:"Theta Fuel", color: "#e5a11f" },
-    { sym: "JASMY",name:"JasmyCoin",  color: "#00a3ff" },
-    { sym: "GMT", name: "STEPN",      color: "#b0ff00" },
-    { sym: "GST", name: "Green Satoshi", color:"#b0ff00" },
-    { sym: "APE", name: "ApeCoin",    color: "#0054f9" },
-    { sym: "LDO", name: "Lido",       color: "#00a3ff" },
-    { sym: "RPL", name: "Rocket Pool",color: "#ff7f50" },
-    { sym: "PEPE",name: "Pepe",       color: "#3dae2b" },
-    { sym: "WIF", name: "dogwifhat",  color: "#c19a6b" },
-    { sym: "BONK",name: "Bonk",       color: "#ff8c00" },
-    { sym: "FLOKI",name:"Floki",      color: "#f5a623" },
-    { sym: "ORDI",name: "ORDI",       color: "#111111" }
+    { sym: "BTC",  name: "Bitcoin",        color: "#f7931a" },
+    { sym: "ETH",  name: "Ethereum",       color: "#627eea" },
+    { sym: "SOL",  name: "Solana",         color: "#14f195" },
+    { sym: "BNB",  name: "BNB",            color: "#f3ba2f" },
+    { sym: "XRP",  name: "XRP",            color: "#23a3dc" },
+    { sym: "ADA",  name: "Cardano",        color: "#0033ad" },
+    { sym: "AVAX", name: "Avalanche",      color: "#e84142" },
+    { sym: "DOGE", name: "Dogecoin",       color: "#c2a633" },
+    { sym: "DOT",  name: "Polkadot",       color: "#e6007a" },
+    { sym: "MATIC",name: "Polygon",        color: "#8247e5" },
+    { sym: "LINK", name: "Chainlink",      color: "#2a5ada" },
+    { sym: "TON",  name: "Toncoin",        color: "#0098ea" },
+    { sym: "TRX",  name: "TRON",           color: "#eb0029" },
+    { sym: "SHIB", name: "Shiba Inu",      color: "#f00500" },
+    { sym: "LTC",  name: "Litecoin",       color: "#a6a9aa" },
+    { sym: "BCH",  name: "Bitcoin Cash",   color: "#8dc351" },
+    { sym: "NEAR", name: "NEAR",           color: "#00c08b" },
+    { sym: "UNI",  name: "Uniswap",        color: "#ff007a" },
+    { sym: "APT",  name: "Aptos",          color: "#00b4d8" },
+    { sym: "ATOM", name: "Cosmos",         color: "#6f7390" },
+    { sym: "FIL",  name: "Filecoin",       color: "#0090ff" },
+    { sym: "ICP",  name: "Internet Computer", color: "#29abe2" },
+    { sym: "ETC",  name: "Ethereum Classic",  color: "#328332" },
+    { sym: "XLM",  name: "Stellar",        color: "#7d00ff" },
+    { sym: "HBAR", name: "Hedera",         color: "#3a3a3a" },
+    { sym: "INJ",  name: "Injective",      color: "#00d2ff" },
+    { sym: "OP",   name: "Optimism",       color: "#ff0420" },
+    { sym: "ARB",  name: "Arbitrum",       color: "#12aaff" },
+    { sym: "SUI",  name: "Sui",            color: "#4da2ff" },
+    { sym: "TIA",  name: "Celestia",       color: "#7b2bf9" },
+    { sym: "SEI",  name: "Sei",            color: "#9e1f19" },
+    { sym: "AAVE", name: "Aave",           color: "#b6509e" },
+    { sym: "MKR",  name: "Maker",          color: "#1aab9b" },
+    { sym: "RNDR", name: "Render",         color: "#ff3a00" },
+    { sym: "IMX",  name: "Immutable",      color: "#0ed0d0" },
+    { sym: "GRT",  name: "The Graph",      color: "#6747ed" },
+    { sym: "ALGO", name: "Algorand",       color: "#4a4a4a" },
+    { sym: "FTM",  name: "Fantom",         color: "#1969ff" },
+    { sym: "SAND", name: "The Sandbox",    color: "#00adef" },
+    { sym: "MANA", name: "Decentraland",   color: "#ff2d55" },
+    { sym: "AXS",  name: "Axie Infinity",  color: "#0055d5" },
+    { sym: "EOS",  name: "EOS",            color: "#443f54" },
+    { sym: "XTZ",  name: "Tezos",          color: "#2c7df7" },
+    { sym: "EGLD", name: "MultiversX",     color: "#1b46c2" },
+    { sym: "FLOW", name: "Flow",           color: "#00ef8b" },
+    { sym: "CHZ",  name: "Chiliz",         color: "#cd0124" },
+    { sym: "CRV",  name: "Curve",          color: "#40649f" },
+    { sym: "SNX",  name: "Synthetix",      color: "#00d1ff" },
+    { sym: "COMP", name: "Compound",       color: "#00d395" },
+    { sym: "ZEC",  name: "Zcash",          color: "#f4b728" },
+    { sym: "DASH", name: "Dash",           color: "#008ce7" },
+    { sym: "NEO",  name: "Neo",            color: "#58bf00" },
+    { sym: "IOTA", name: "IOTA",           color: "#5c6c8a" },
+    { sym: "QTUM", name: "Qtum",           color: "#2e9ad0" },
+    { sym: "WAVES",name: "Waves",          color: "#0155ff" },
+    { sym: "KSM",  name: "Kusama",         color: "#4a4a4a" },
+    { sym: "ZIL",  name: "Zilliqa",        color: "#49c1e0" },
+    { sym: "ONE",  name: "Harmony",        color: "#00ade8" },
+    { sym: "ENJ",  name: "Enjin",          color: "#7866d5" },
+    { sym: "BAT",  name: "Basic Attention",color: "#ff5000" },
+    { sym: "ANKR", name: "Ankr",           color: "#356dff" },
+    { sym: "STORJ",name: "Storj",          color: "#268ff7" },
+    { sym: "KAVA", name: "Kava",           color: "#ff564f" },
+    { sym: "ROSE", name: "Oasis",          color: "#0092f6" },
+    { sym: "CELO", name: "Celo",           color: "#35d07f" },
+    { sym: "BAND", name: "Band Protocol",  color: "#516aff" },
+    { sym: "OCEAN",name: "Ocean",          color: "#4a4a4a" },
+    { sym: "RSR",  name: "Reserve Rights", color: "#5b5b5b" },
+    { sym: "LRC",  name: "Loopring",       color: "#1c42ff" },
+    { sym: "SUSHI",name: "SushiSwap",      color: "#5c4a6b" },
+    { sym: "YFI",  name: "yearn.finance",  color: "#006ae3" },
+    { sym: "UMA",  name: "UMA",            color: "#ff4a4a" },
+    { sym: "REN",  name: "Ren",            color: "#4a5a72" },
+    { sym: "KNC",  name: "Kyber",          color: "#31cb9e" },
+    { sym: "BAL",  name: "Balancer",       color: "#5a5a5a" },
+    { sym: "CVC",  name: "Civic",          color: "#3ab03e" },
+    { sym: "GNO",  name: "Gnosis",         color: "#04795b" },
+    { sym: "NMR",  name: "Numeraire",      color: "#4d6b8a" },
+    { sym: "MLN",  name: "Enzyme",         color: "#5a5a5a" },
+    { sym: "REP",  name: "Augur",          color: "#602a52" },
+    { sym: "ANT",  name: "Aragon",         color: "#24d3ee" },
+    { sym: "HNT",  name: "Helium",         color: "#474dff" },
+    { sym: "AKT",  name: "Akash",          color: "#ff4141" },
+    { sym: "AR",   name: "Arweave",        color: "#5a5a5a" },
+    { sym: "THETA",name: "Theta",          color: "#2ab8e6" },
+    { sym: "TFUEL",name: "Theta Fuel",     color: "#e5a11f" },
+    { sym: "JASMY",name: "JasmyCoin",      color: "#00a3ff" },
+    { sym: "GMT",  name: "STEPN",          color: "#b0ff00" },
+    { sym: "APE",  name: "ApeCoin",        color: "#0054f9" },
+    { sym: "LDO",  name: "Lido",           color: "#00a3ff" },
+    { sym: "RPL",  name: "Rocket Pool",    color: "#ff7f50" },
+    { sym: "PEPE", name: "Pepe",           color: "#3dae2b" },
+    { sym: "WIF",  name: "dogwifhat",      color: "#c19a6b" },
+    { sym: "BONK", name: "Bonk",           color: "#ff8c00" },
+    { sym: "FLOKI",name: "Floki",          color: "#f5a623" },
+    { sym: "ORDI", name: "ORDI",           color: "#5a5a5a" }
   ];
 
   /* =======================================================
-     2) GENERATORE PSEUDO-CASUALE DETERMINISTICO
+     2) DETERMINISTIC PSEUDO-RANDOM GENERATOR
      ======================================================= */
   function hashCode(str) {
     let h = 2166136261;
@@ -133,7 +132,7 @@
   }
 
   /* =======================================================
-     3) CALCOLO VOLATILITÀ (deviazione standard)
+     3) VOLATILITY MATH (standard deviation)
      ======================================================= */
   function stdDev(arr) {
     if (arr.length < 2) return 0;
@@ -146,10 +145,8 @@
   function generateReturns(sym, days) {
     const rnd = mulberry32(hashCode(sym));
     const out = [];
-    // "vol base" diversa per ogni asset, così i valori sono realistici
     const base = 0.6 + rnd() * 3.4; // 0.6% .. 4%
     for (let i = 0; i < days; i++) {
-      // distribuzione approssimativamente normale (Box-Muller)
       const u1 = Math.max(rnd(), 1e-9);
       const u2 = rnd();
       const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
@@ -164,8 +161,8 @@
       const r7  = generateReturns(c.sym + "-7", 7);
       const r1  = generateReturns(c.sym + "-1", 1);
 
-      const vol  = stdDev(r30);                        // σ giornaliera (30D)
-      const perf24 = r1.reduce((a, b) => a + b, 0);    // somma 1 giorno
+      const vol    = stdDev(r30);
+      const perf24 = r1.reduce((a, b) => a + b, 0);
       const perf7  = r7.reduce((a, b) => a + b, 0);
       const perf30 = r30.reduce((a, b) => a + b, 0);
 
@@ -176,15 +173,16 @@
         vol: +vol.toFixed(2),
         r24: +perf24.toFixed(2),
         r7:  +perf7.toFixed(2),
-        r30: +perf30.toFixed(2)
+        r30: +perf30.toFixed(2),
+        series: r30.slice() // 30-day series for sparklines
       };
     });
   }
 
   /* =======================================================
-     4) UTILS UI
+     4) UI HELPERS
      ======================================================= */
-  const $  = (sel) => document.querySelector(sel);
+  const $ = (sel) => document.querySelector(sel);
 
   function fmtPct(v) {
     if (v == null || isNaN(v)) return "—";
@@ -213,8 +211,14 @@
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
+  function getCssVar(name) {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue(name)
+      .trim();
+  }
+
   /* =======================================================
-     5) STATO APPLICAZIONE
+     5) APP STATE
      ======================================================= */
   const state = {
     top: 10,
@@ -225,13 +229,13 @@
   };
 
   /* =======================================================
-     6) CHART.JS — configurazione
+     6) CHART.JS
      ======================================================= */
   let chartVol  = null;
   let chartPerf = null;
 
-  const gridColor  = "rgba(120, 150, 210, 0.10)";
-  const tickColor  = "#9fb0d0";
+  function chartGridColor() { return getCssVar("--line"); }
+  function chartTickColor() { return getCssVar("--text-2"); }
   const fontFamily = "Inter, system-ui, sans-serif";
 
   function buildVolChart(labels, values, colors) {
@@ -243,7 +247,7 @@
       data: {
         labels,
         datasets: [{
-          label: "σ giornaliera (%)",
+          label: "σ daily (%)",
           data: values,
           backgroundColor: colors.map(c => hexToRgba(c, 0.55)),
           borderColor: colors,
@@ -259,15 +263,15 @@
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: "rgba(10,15,28,0.95)",
-            borderColor: "rgba(109,140,255,0.4)",
+            backgroundColor: "rgba(30,40,68,0.95)",
+            borderColor: "rgba(142,166,255,0.4)",
             borderWidth: 1,
-            titleColor: "#e8eefc",
-            bodyColor: "#9fb0d0",
+            titleColor: "#eef2fb",
+            bodyColor: "#b3c1dd",
             padding: 10,
             displayColors: false,
             callbacks: {
-              label: (item) => ` ${item.parsed.y.toFixed(2)}%  ·  σ giornaliera`
+              label: (item) => ` ${item.parsed.y.toFixed(2)}%  ·  σ daily`
             }
           }
         },
@@ -275,16 +279,16 @@
           x: {
             grid: { display: false },
             ticks: {
-              color: tickColor,
+              color: chartTickColor(),
               font: { family: fontFamily, size: 11, weight: "600" }
             }
           },
           y: {
             beginAtZero: true,
-            grid: { color: gridColor },
+            grid: { color: chartGridColor() },
             border: { display: false },
             ticks: {
-              color: tickColor,
+              color: chartTickColor(),
               font: { family: fontFamily, size: 11 },
               callback: (v) => v + "%"
             }
@@ -299,10 +303,10 @@
     if (chartPerf) chartPerf.destroy();
 
     const colors = values.map(v =>
-      v >= 0 ? "rgba(46,230,166,0.75)" : "rgba(255,93,122,0.75)"
+      v >= 0 ? "rgba(125,243,200,0.75)" : "rgba(255,159,178,0.75)"
     );
     const borders = values.map(v =>
-      v >= 0 ? "#2ee6a6" : "#ff5d7a"
+      v >= 0 ? "#7df3c8" : "#ff9fb2"
     );
 
     chartPerf = new Chart(ctx, {
@@ -326,11 +330,11 @@
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: "rgba(10,15,28,0.95)",
-            borderColor: "rgba(109,140,255,0.4)",
+            backgroundColor: "rgba(30,40,68,0.95)",
+            borderColor: "rgba(142,166,255,0.4)",
             borderWidth: 1,
-            titleColor: "#e8eefc",
-            bodyColor: "#9fb0d0",
+            titleColor: "#eef2fb",
+            bodyColor: "#b3c1dd",
             padding: 10,
             displayColors: false,
             callbacks: {
@@ -342,15 +346,15 @@
           x: {
             grid: { display: false },
             ticks: {
-              color: tickColor,
+              color: chartTickColor(),
               font: { family: fontFamily, size: 11, weight: "600" }
             }
           },
           y: {
-            grid: { color: gridColor },
+            grid: { color: chartGridColor() },
             border: { display: false },
             ticks: {
-              color: tickColor,
+              color: chartTickColor(),
               font: { family: fontFamily, size: 11 },
               callback: (v) => v + "%"
             }
@@ -361,7 +365,57 @@
   }
 
   /* =======================================================
-     7) RENDER TABELLA
+     7) SPARKLINE (small inline canvas)
+     ======================================================= */
+  function drawSparkline(canvas, series, color) {
+    const ctx = canvas.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvas.clientWidth || 90;
+    const h = canvas.clientHeight || 28;
+    canvas.width  = w * dpr;
+    canvas.height = h * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, w, h);
+
+    if (!series || series.length < 2) return;
+
+    const min = Math.min(...series);
+    const max = Math.max(...series);
+    const span = max - min || 1;
+    const stepX = w / (series.length - 1);
+    const pad = 3;
+
+    // build smooth path
+    const pts = series.map((v, i) => ({
+      x: i * stepX,
+      y: h - pad - ((v - min) / span) * (h - pad * 2)
+    }));
+
+    // gradient fill below line
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, hexToRgba(color, 0.35));
+    grad.addColorStop(1, hexToRgba(color, 0.02));
+
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, h);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(pts[pts.length - 1].x, h);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // stroke line
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.6;
+    ctx.lineJoin = "round";
+    ctx.stroke();
+  }
+
+  /* =======================================================
+     8) TABLE RENDER
      ======================================================= */
   function renderTable(rows) {
     const tbody = $("#tableBody");
@@ -385,8 +439,15 @@
         <td class="${signClass(r.r7)}">${fmtPct(r.r7)}</td>
         <td class="${signClass(r.r30)}">${fmtPct(r.r30)}</td>
         <td><span class="badge ${lvl.css}">${lvl.label}</span></td>
+        <td class="spark-cell"><canvas class="spark" width="90" height="28"></canvas></td>
       `;
+
       frag.appendChild(tr);
+
+      // draw sparkline after element is in DOM (next tick)
+      const canvas = tr.querySelector("canvas.spark");
+      const lineColor = r.r30 >= 0 ? "#7df3c8" : "#ff9fb2";
+      requestAnimationFrame(() => drawSparkline(canvas, r.series, lineColor));
     });
 
     tbody.innerHTML = "";
@@ -394,7 +455,7 @@
   }
 
   /* =======================================================
-     8) ORDINAMENTO
+     9) SORTING
      ======================================================= */
   function sortRows(rows) {
     const k = state.sortKey;
@@ -415,12 +476,12 @@
   }
 
   /* =======================================================
-     9) KPI
+     10) KPI
      ======================================================= */
   function renderKpis(rows) {
     const avg = rows.reduce((s, r) => s + r.vol, 0) / (rows.length || 1);
-    $("#kpiCount").textContent    = rows.length;
-    $("#kpiAvgVol").textContent   = avg.toFixed(2) + "%";
+    $("#kpiCount").textContent  = rows.length;
+    $("#kpiAvgVol").textContent = avg.toFixed(2) + "%";
 
     let best = rows[0], worst = rows[0];
     rows.forEach((r) => {
@@ -428,14 +489,14 @@
       if (r.r24 < worst.r24) worst = r;
     });
 
-    $("#kpiBest").textContent     = fmtPct(best.r24);
-    $("#kpiBestName").textContent = best.sym;
-    $("#kpiWorst").textContent    = fmtPct(worst.r24);
+    $("#kpiBest").textContent      = fmtPct(best.r24);
+    $("#kpiBestName").textContent  = best.sym;
+    $("#kpiWorst").textContent     = fmtPct(worst.r24);
     $("#kpiWorstName").textContent = worst.sym;
   }
 
   /* =======================================================
-     10) RENDER PRINCIPALE
+     11) MASTER RENDER
      ======================================================= */
   function render() {
     const slice = state.data.slice(0, state.top);
@@ -445,13 +506,11 @@
     renderKpis(rows);
     updateSortIndicators();
 
-    // testi note
-    $("#volNote").textContent   = `σ giornaliera · top ${state.top}`;
-    $("#perfNote").textContent  = `variazione % · top ${state.top}`;
+    $("#volNote").textContent   = `σ daily · top ${state.top}`;
+    $("#perfNote").textContent  = `% change · top ${state.top}`;
     $("#perfPeriodLabel").textContent = state.period;
     $("#universeCount").textContent   = COINS.length;
 
-    // grafici
     const labels = rows.map(r => r.sym);
     const vols   = rows.map(r => r.vol);
     const colors = rows.map(r => r.color);
@@ -463,17 +522,17 @@
   }
 
   /* =======================================================
-     11) OROLOGIO + COUNTDOWN
+     12) CLOCK + COUNTDOWN
      ======================================================= */
   const REFRESH_SECONDS = 5;
   let secondsLeft = REFRESH_SECONDS;
 
   function updateClock() {
     const now = new Date();
-    const dateStr = now.toLocaleDateString("it-IT", {
+    const dateStr = now.toLocaleDateString("en-US", {
       weekday: "long", day: "2-digit", month: "long", year: "numeric"
     });
-    const timeStr = now.toLocaleTimeString("it-IT", { hour12: false });
+    const timeStr = now.toLocaleTimeString("en-US", { hour12: false });
 
     $("#clockDate").textContent = dateStr;
     $("#clockTime").textContent = timeStr;
@@ -489,12 +548,12 @@
   }
 
   /* =======================================================
-     12) REFRESH DATI
+     13) DATA REFRESH
      ======================================================= */
   function refreshData(silent) {
     state.data = buildDataset();
     render();
-    if (!silent) showToast("Dati aggiornati ✦");
+    if (!silent) showToast("Data updated ✦");
   }
 
   function showToast(msg) {
@@ -514,10 +573,75 @@
   }
 
   /* =======================================================
-     13) EVENTI
+     14) CSV EXPORT
+     ======================================================= */
+  function exportCSV() {
+    const slice = state.data.slice(0, state.top);
+    const rows  = sortRows(slice);
+
+    const header = ["Symbol", "Name", "24H (%)", "7D (%)", "30D (%)", "Volatility (σ)", "Level"];
+    const lines  = [header.join(",")];
+
+    rows.forEach(r => {
+      const lvl = volLevel(r.vol).label;
+      lines.push([
+        r.sym,
+        `"${r.name}"`,
+        r.r24.toFixed(2),
+        r.r7.toFixed(2),
+        r.r30.toFixed(2),
+        r.vol.toFixed(2),
+        lvl
+      ].join(","));
+    });
+
+    const csv  = "\uFEFF" + lines.join("\n"); // BOM for Excel
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url  = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    a.href = url;
+    a.download = `crypto-volatility-${state.top}-${state.period}-${stamp}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast("CSV exported ⬇");
+  }
+
+  /* =======================================================
+     15) THEME TOGGLE
+     ======================================================= */
+  function setTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("cvs-theme", theme);
+    $("#themeIcon").textContent = theme === "dark" ? "🌙" : "☀️";
+
+    // refresh charts so colors update
+    if (state.data.length) render();
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute("data-theme");
+    setTheme(current === "dark" ? "light" : "dark");
+  }
+
+  function initTheme() {
+    const saved = localStorage.getItem("cvs-theme");
+    if (saved) {
+      setTheme(saved);
+    } else {
+      const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+      setTheme(prefersLight ? "light" : "dark");
+    }
+  }
+
+  /* =======================================================
+     16) EVENTS
      ======================================================= */
   function bindEvents() {
-    // filtro universo
     document.querySelectorAll("#filterTop .seg").forEach((btn) => {
       btn.addEventListener("click", () => {
         document.querySelectorAll("#filterTop .seg")
@@ -528,7 +652,6 @@
       });
     });
 
-    // filtro periodo
     document.querySelectorAll("#filterPeriod .seg").forEach((btn) => {
       btn.addEventListener("click", () => {
         document.querySelectorAll("#filterPeriod .seg")
@@ -539,7 +662,6 @@
       });
     });
 
-    // ordinamento tabella
     document.querySelectorAll(".table thead th.sortable").forEach((th) => {
       th.addEventListener("click", () => {
         const key = th.dataset.sort;
@@ -553,10 +675,10 @@
       });
     });
 
-    // pulsante refresh
     $("#btnRefresh").addEventListener("click", manualRefresh);
+    $("#btnCsv").addEventListener("click", exportCSV);
+    $("#btnTheme").addEventListener("click", toggleTheme);
 
-    // F5 → aggiorna i dati senza ricaricare la pagina
     document.addEventListener("keydown", (e) => {
       if (e.key === "F5") {
         e.preventDefault();
@@ -564,18 +686,26 @@
       }
     });
 
-    // pausa countdown quando la tab non è visibile
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) secondsLeft = REFRESH_SECONDS;
+    });
+
+    window.addEventListener("resize", () => {
+      clearTimeout(bindEvents._rt);
+      bindEvents._rt = setTimeout(() => {
+        // redraw sparklines on resize
+        if (state.data.length) render();
+      }, 200);
     });
   }
 
   /* =======================================================
-     14) INIT
+     17) INIT
      ======================================================= */
   function init() {
     $("#year").textContent = new Date().getFullYear();
 
+    initTheme();
     refreshData(true);
     bindEvents();
 
