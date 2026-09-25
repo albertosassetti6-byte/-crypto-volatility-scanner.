@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="theme-color" content="#060912" />
+<meta name="theme-color" content="#12182b" />
 <title>Crypto Volatility Scanner ⚡ | Sicalimer Finanziario</title>
-<meta name="description" content="Crypto Volatility Scanner: misura la volatilità delle principali criptovalute con dati di mercato in tempo reale, grafici Chart.js e filtri Top 10 / 50 / 100." />
+<meta name="description" content="Crypto Volatility Scanner: measure crypto market volatility with live market data, Chart.js visualizations, sparklines and Top 10 / 50 / 100 filters." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,13 +15,12 @@
 </head>
 <body>
 
-  <!-- sfondo decorativo -->
   <div class="aurora" aria-hidden="true"></div>
 
   <!-- ================= TOP BAR ================= -->
   <header class="topbar">
     <div class="topbar__inner">
-      <div class="live" title="Feed attivo">
+      <div class="live" title="Live feed active">
         <span class="dot"></span>
         <span>LIVE</span>
       </div>
@@ -32,9 +31,14 @@
       </div>
 
       <div class="topbar__actions">
-        <span class="next-in">refresh tra <b id="nextIn">5</b>s</span>
-        <button class="btn-refresh" id="btnRefresh" title="Aggiorna i dati (oppure premi F5)">
-          <span class="btn-refresh__ico">⟳</span> Aggiorna
+        <span class="next-in">refresh in <b id="nextIn">5</b>s</span>
+
+        <button class="btn-icon" id="btnTheme" title="Toggle light / dark theme" aria-label="Toggle theme">
+          <span id="themeIcon">🌙</span>
+        </button>
+
+        <button class="btn-refresh" id="btnRefresh" title="Refresh data (or press F5)">
+          <span class="btn-refresh__ico">⟳</span> Refresh
         </button>
       </div>
     </div>
@@ -47,19 +51,19 @@
       Crypto <span class="grad">Volatility</span> Scanner ⚡
     </h1>
     <p class="hero__slogan">
-      Misura la volatilità. Anticipa il mercato. Decidi con i dati.
+      Measure the volatility. Anticipate the market. Decide with data.
     </p>
     <p class="hero__sub">
-      Scanner statistico su <b id="universeCount">100</b> asset digitali · σ (deviazione standard)
-      calcolata su 30 giorni di rendimenti giornalieri
+      Statistical scanner covering <b id="universeCount">100</b> digital assets · σ (standard deviation)
+      computed on 30 days of daily returns
     </p>
   </section>
 
-  <!-- ================= CONTROLLI / FILTRI ================= -->
-  <section class="controls" aria-label="Filtri">
+  <!-- ================= FILTERS ================= -->
+  <section class="controls" aria-label="Filters">
     <div class="controls__group">
-      <span class="controls__label">Universo</span>
-      <div class="segmented" id="filterTop" role="group" aria-label="Filtro universo">
+      <span class="controls__label">Universe</span>
+      <div class="segmented" id="filterTop" role="group" aria-label="Universe filter">
         <button class="seg is-active" data-top="10">Top 10</button>
         <button class="seg" data-top="50">Top 50</button>
         <button class="seg" data-top="100">Top 100</button>
@@ -67,67 +71,74 @@
     </div>
 
     <div class="controls__group">
-      <span class="controls__label">Periodo</span>
-      <div class="segmented" id="filterPeriod" role="group" aria-label="Filtro periodo">
+      <span class="controls__label">Period</span>
+      <div class="segmented" id="filterPeriod" role="group" aria-label="Period filter">
         <button class="seg is-active" data-period="24H">24H</button>
         <button class="seg" data-period="7D">7D</button>
         <button class="seg" data-period="30D">30D</button>
       </div>
     </div>
+
+    <div class="controls__group">
+      <span class="controls__label">Export</span>
+      <button class="btn-outline" id="btnCsv" title="Download the current view as CSV">
+        ⬇ Export CSV
+      </button>
+    </div>
   </section>
 
   <!-- ================= KPI ================= -->
-  <section class="kpis" aria-label="Statistiche rapide">
+  <section class="kpis" aria-label="Quick stats">
     <article class="kpi">
-      <span class="kpi__label">Asset monitorati</span>
+      <span class="kpi__label">Assets tracked</span>
       <strong class="kpi__value" id="kpiCount">10</strong>
-      <span class="kpi__hint">nel filtro attivo</span>
+      <span class="kpi__hint">in the active filter</span>
     </article>
     <article class="kpi">
-      <span class="kpi__label">Volatilità media</span>
+      <span class="kpi__label">Average volatility</span>
       <strong class="kpi__value" id="kpiAvgVol">—</strong>
-      <span class="kpi__hint">σ giornaliera</span>
+      <span class="kpi__hint">σ daily</span>
     </article>
     <article class="kpi">
-      <span class="kpi__label">Miglior 24H</span>
+      <span class="kpi__label">Best 24H</span>
       <strong class="kpi__value pos" id="kpiBest">—</strong>
       <span class="kpi__hint" id="kpiBestName">—</span>
     </article>
     <article class="kpi">
-      <span class="kpi__label">Peggior 24H</span>
+      <span class="kpi__label">Worst 24H</span>
       <strong class="kpi__value neg" id="kpiWorst">—</strong>
       <span class="kpi__hint" id="kpiWorstName">—</span>
     </article>
   </section>
 
-  <!-- ================= GRAFICI ================= -->
+  <!-- ================= CHARTS ================= -->
   <section class="charts">
     <article class="card chart-card">
       <header class="card__head">
-        <h2 class="card__title">Volatilità per asset</h2>
-        <span class="card__note" id="volNote">σ giornaliera · top 10</span>
+        <h2 class="card__title">Volatility per asset</h2>
+        <span class="card__note" id="volNote">σ daily · top 10</span>
       </header>
       <div class="chart-box">
-        <canvas id="chartVol" aria-label="Grafico volatilità"></canvas>
+        <canvas id="chartVol" aria-label="Volatility chart"></canvas>
       </div>
     </article>
 
     <article class="card chart-card">
       <header class="card__head">
         <h2 class="card__title">Performance <span id="perfPeriodLabel">24H</span></h2>
-        <span class="card__note" id="perfNote">variazione % · top 10</span>
+        <span class="card__note" id="perfNote">% change · top 10</span>
       </header>
       <div class="chart-box">
-        <canvas id="chartPerf" aria-label="Grafico performance"></canvas>
+        <canvas id="chartPerf" aria-label="Performance chart"></canvas>
       </div>
     </article>
   </section>
 
-  <!-- ================= TABELLA ================= -->
+  <!-- ================= TABLE ================= -->
   <section class="card table-card">
     <header class="card__head">
       <h2 class="card__title">Scanner</h2>
-      <span class="card__note">Clicca sulle intestazioni per ordinare</span>
+      <span class="card__note">Click on column headers to sort</span>
     </header>
 
     <div class="table-wrap">
@@ -139,10 +150,11 @@
             <th class="sortable" data-sort="r7">7D</th>
             <th class="sortable" data-sort="r30">30D</th>
             <th class="sortable th-vol" data-sort="vol">Volatility</th>
+            <th class="th-spark">Trend</th>
           </tr>
         </thead>
         <tbody id="tableBody">
-          <!-- generato da JavaScript -->
+          <!-- generated by JavaScript -->
         </tbody>
       </table>
     </div>
@@ -156,53 +168,59 @@
 
   <!-- ================= FOOTER ================= -->
   <footer class="footer">
-    <p class="footer__brand">Sicalimer Finanziario</p>
+    <div class="footer__brand-wrap">
+      <p class="footer__brand">Sicalimer Finanziario</p>
+      <p class="footer__tagline">Independent crypto market research &amp; analytics</p>
+    </div>
+
+    <nav class="footer__nav" aria-label="Footer navigation">
+      <a href="#home">Home</a>
+      <span class="footer__sep">•</span>
+      <a href="#about">About</a>
+      <span class="footer__sep">•</span>
+      <a href="#contact">Contact</a>
+    </nav>
 
     <div class="disclaimer">
-      <h3 class="disclaimer__title">⚠️ Disclaimer finanziario</h3>
+      <h3 class="disclaimer__title">⚠️ Financial Disclaimer</h3>
       <p>
-        Le informazioni, i dati, i grafici e gli indicatori statistici pubblicati su
-        <b>Crypto Volatility Scanner ⚡</b> sono forniti esclusivamente a scopo
-        <b>informativo, didattico e di ricerca</b>. Essi <b>non costituiscono</b> in alcun modo
-        consulenza finanziaria, di investimento, legale, contabile o fiscale, né un'offerta,
-        una sollecitazione o una raccomandazione all'acquisto o alla vendita di criptovalute,
-        strumenti finanziari o qualsiasi altro prodotto.
+        All information, data, charts and statistical indicators published on
+        <b>Crypto Volatility Scanner ⚡</b> are provided strictly for
+        <b>informational, educational and research purposes</b>. They
+        <b>do not constitute</b> in any way financial, investment, legal, accounting or tax
+        advice, nor an offer, solicitation or recommendation to buy or sell cryptocurrencies,
+        financial instruments or any other product.
       </p>
       <p>
-        I dati di mercato sono erogati da <b>biquote.io</b> tramite feed <b>MetaTrader 5</b> e
-        possono essere ritardati, parziali, sospesi o soggetti a errori di trasmissione. La
-        misura di volatilità mostrata è una <b>semplice deviazione standard</b> calcolata sui
-        rendimenti giornalieri degli ultimi 30 giorni: si tratta di una stima statistica
-        semplificata che <b>non</b> incorpora tutti i fattori di rischio di mercato e non ha
-        valore previsionale.
+        Market data is provided by <b>biquote.io</b> through a <b>MetaTrader 5</b> feed and may
+        be delayed, partial, suspended or subject to transmission errors. The volatility
+        measure shown is a <b>simple standard deviation</b> computed on daily returns over the
+        last 30 days: it is a simplified statistical estimate that <b>does not</b> incorporate
+        all market risk factors and has no predictive value.
       </p>
       <p>
-        Le criptovalute sono strumenti <b>estremamente volatili e rischiosi</b>: il valore degli
-        investimenti può aumentare o diminuire anche in modo repentino e l'investitore può
-        subire la perdita totale del capitale. I <b>rendimenti passati non sono in alcun modo
-        indicativi dei rendimenti futuri</b>. Nessuna decisione operativa dovrebbe essere
-        assunta sulla base esclusiva delle informazioni qui riportate.
+        Cryptocurrencies are <b>extremely volatile and risky</b> instruments: the value of
+        investments may rise or fall abruptly and investors may suffer the total loss of their
+        capital. <b>Past performance is not in any way indicative of future results</b>. No
+        trading decision should be made on the basis of the information shown here alone.
       </p>
       <p>
-        L'autore e l'editore del sito <b>non assumono alcuna responsabilità</b> per eventuali
-        perdite, danni diretti o indiretti, mancati guadagni o conseguenze derivanti dall'uso
-        delle informazioni contenute in questa pagina. Prima di effettuare qualsiasi operazione
-        su strumenti finanziari o cripto-asset, si raccomanda di consultare un
-        <b>consulente finanziario abilitato</b> e di verificare la normativa vigente nel proprio
-        Paese di residenza. L'utente è l'unico e solo responsabile delle proprie scelte di
-        investimento.
+        The author and publisher of this site <b>assume no responsibility</b> for any loss,
+        direct or indirect damage, lost profits or consequences arising from the use of the
+        information contained on this page. Before carrying out any transaction in financial
+        or crypto instruments, you should consult a <b>licensed financial advisor</b> and
+        verify the regulations in force in your country of residence. The user is the sole
+        person responsible for their own investment decisions.
       </p>
     </div>
 
     <p class="footer__copy">
-      © <span id="year">2025</span> Sicalimer Finanziario · Crypto Volatility Scanner ⚡ — Tutti i diritti riservati.
+      © <span id="year">2025</span> Sicalimer Finanziario · Crypto Volatility Scanner ⚡ — All rights reserved.
     </p>
   </footer>
 
-  <!-- toast -->
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="script.js"></script>
 </body>
