@@ -614,23 +614,29 @@ body{
 }
 
 /* =========================================================
-   DATA SOURCE
+   DATA SOURCE — CENTERED
    ========================================================= */
+.datasource-wrap{
+  display: flex;
+  justify-content: center;
+  padding: 0 20px 26px;
+}
+
 .datasource{
-  max-width: 1280px;
-  margin: 0 auto 26px;
-  padding: 12px 22px;
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  padding: 12px 22px;
   font-size: 12.5px;
   color: var(--text-2);
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 999px;
-  margin-left: 20px;
-  margin-right: 20px;
   font-family: var(--mono);
+  text-align: center;
+  max-width: 100%;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 .datasource b{ color: var(--cyan); }
 
@@ -639,6 +645,7 @@ body{
   border-radius: 50%;
   background: var(--cyan);
   animation: pulse 1.8s infinite;
+  flex-shrink: 0;
 }
 
 /* =========================================================
@@ -720,6 +727,7 @@ body{
   color: var(--amber);
   margin-bottom: 14px;
   letter-spacing: 0.3px;
+  text-align: center;
 }
 
 .disclaimer p{
@@ -732,8 +740,10 @@ body{
 .disclaimer b{ color: var(--text); }
 
 .footer__copy{
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--text-3);
+  text-align: center;
+  letter-spacing: 0.2px;
 }
 
 /* =========================================================
@@ -787,7 +797,9 @@ body{
   .table thead th{ padding: 12px 14px; }
   .table tbody td{ padding: 12px 14px; }
 
-  .datasource{ margin-left: 16px; margin-right: 16px; font-size: 11px; }
+  .datasource-wrap{ padding: 0 16px 22px; }
+  .datasource{ font-size: 11px; padding: 10px 16px; }
+
   .disclaimer{ padding: 18px 18px; }
   .footer{ padding: 30px 16px 16px; }
 }
