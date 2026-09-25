@@ -385,13 +385,11 @@
     const stepX = w / (series.length - 1);
     const pad = 3;
 
-    // build smooth path
     const pts = series.map((v, i) => ({
       x: i * stepX,
       y: h - pad - ((v - min) / span) * (h - pad * 2)
     }));
 
-    // gradient fill below line
     const grad = ctx.createLinearGradient(0, 0, 0, h);
     grad.addColorStop(0, hexToRgba(color, 0.35));
     grad.addColorStop(1, hexToRgba(color, 0.02));
@@ -404,7 +402,6 @@
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // stroke line
     ctx.beginPath();
     ctx.moveTo(pts[0].x, pts[0].y);
     pts.forEach(p => ctx.lineTo(p.x, p.y));
@@ -444,7 +441,6 @@
 
       frag.appendChild(tr);
 
-      // draw sparkline after element is in DOM (next tick)
       const canvas = tr.querySelector("canvas.spark");
       const lineColor = r.r30 >= 0 ? "#7df3c8" : "#ff9fb2";
       requestAnimationFrame(() => drawSparkline(canvas, r.series, lineColor));
@@ -619,7 +615,6 @@
     localStorage.setItem("cvs-theme", theme);
     $("#themeIcon").textContent = theme === "dark" ? "🌙" : "☀️";
 
-    // refresh charts so colors update
     if (state.data.length) render();
   }
 
@@ -693,7 +688,6 @@
     window.addEventListener("resize", () => {
       clearTimeout(bindEvents._rt);
       bindEvents._rt = setTimeout(() => {
-        // redraw sparklines on resize
         if (state.data.length) render();
       }, 200);
     });
@@ -703,8 +697,6 @@
      17) INIT
      ======================================================= */
   function init() {
-    $("#year").textContent = new Date().getFullYear();
-
     initTheme();
     refreshData(true);
     bindEvents();
