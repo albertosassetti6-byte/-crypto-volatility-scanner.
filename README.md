@@ -123,5 +123,84 @@ crypto-volatility-scanner/
 └── README.md # This file
 
 
+No dependencies to install. No bundler. Just **open `index.html`** and it works.
+
+---
+
+## 🏁 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/<your-username>/crypto-volatility-scanner.git
+cd crypto-volatility-scanner
+
+# Python 3
+python -m http.server 8000
+
+# Node.js (npx)
+npx serve .
+
+const COINS = [
+  { sym: "BTC", name: "Bitcoin",  color: "#f7931a" },
+  { sym: "ETH", name: "Ethereum", color: "#627eea" },
+  // ...
+];
+
+function volLevel(vol) {
+  if (vol < 1.6) return { label: "Low",    css: "badge--low" };
+  if (vol < 3.0) return { label: "Medium", css: "badge--medium" };
+  return              { label: "High",   css: "badge--high" };
+}
 
 
+:root,
+[data-theme="dark"]{
+  --brand:   #8ea6ff;
+  --brand-2: #c2a3ff;
+  --cyan:    #7ee0f5;
+  --green:   #7df3c8;
+  --red:     #ff9fb2;
+  --amber:   #ffd18a;
+  /* ... */
+}
+
+async function buildDataset() {
+  const res  = await fetch("https://api.example.com/crypto/ohlc");
+  const raw  = await res.json();
+  return raw.map(r => {
+    const returns = r.closes.map((c, i, a) => i ? (c - a[i-1]) / a[i-1] * 100 : 0).slice(1);
+    const vol     = stdDev(returns);
+    return { sym: r.symbol, name: r.name, color: r.color,
+             vol: +vol.toFixed(2), r24: r.change24, r7: r.change7, r30: r.change30,
+             series: returns };
+  });
+}
+
+MIT License
+
+Copyright (c) 2026 Sicalimer
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+crypto-volatility-scanner/
+├── index.html     ← main HTML
+├── style.css      ← all styling
+├── script.js      ← logic + charts + sparklines + CSV
+└── README.md      ← this file
